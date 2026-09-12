@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 from skimage.feature import hog
 from PIL import Image
+import os
+import random
 
 
 # ============================================================
@@ -104,143 +106,282 @@ face_cascade = load_face_detector()
 
 
 # ============================================================
-# PLAYER PROFILE DATA
-# ============================================================
-# Anonymous labels are used for the ML prediction.
-# Profiles are accessed separately through the dropdown.
+# PLAYER NAME MAPPING
 # ============================================================
 
-player_profiles = {
+player_names = {
 
-    "Player_1": {
-        "title": "Player Profile 1",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
+    "Player_1": "Ambati Rayudu",
+    "Player_2": "Hardik Pandya",
+    "Player_3": "Jasprit Bumrah",
+    "Player_4": "Kapil Dev",
+    "Player_5": "M.S. Dhoni",
+    "Player_6": "Ravindra Jadeja",
+    "Player_7": "Rohit Sharma",
+    "Player_8": "Ruturaj Gaikwad",
+    "Player_9": "Sachin Tendulkar",
+    "Player_10": "Virat Kohli"
 
-    "Player_2": {
-        "title": "Player Profile 2",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_3": {
-        "title": "Player Profile 3",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_4": {
-        "title": "Player Profile 4",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_5": {
-        "title": "Player Profile 5",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_6": {
-        "title": "Player Profile 6",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_7": {
-        "title": "Player Profile 7",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_8": {
-        "title": "Player Profile 8",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_9": {
-        "title": "Player Profile 9",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    },
-
-    "Player_10": {
-        "title": "Player Profile 10",
-        "role": "Indian Cricketer",
-        "bio": "This profile contains biographical and career information for the selected player.",
-        "career": "Professional cricket career with experience in competitive matches.",
-        "achievements": [
-            "Represented teams in professional cricket",
-            "Participated in major cricket competitions",
-            "Contributed to team performances"
-        ]
-    }
 }
 
 
 # ============================================================
-# FUNCTION: EXTRACT HOG FEATURES
+# PLAYER PROFILE DATA
+# ============================================================
+
+player_profiles = {
+
+    "Ambati Rayudu": {
+        "role": "Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Ambati Rayudu is an Indian cricketer known for his batting "
+            "and his performances in domestic and international cricket."
+        ),
+        "career": (
+            "Rayudu represented India in limited-overs cricket and played "
+            "for several teams in domestic cricket and the Indian Premier League."
+        ),
+        "achievements": [
+            "Represented India in international cricket",
+            "Played for multiple IPL teams",
+            "Known for his middle-order batting"
+        ]
+    },
+
+    "Hardik Pandya": {
+        "role": "All-rounder",
+        "batting": "Right-handed",
+        "about": (
+            "Hardik Pandya is an Indian international cricketer known for "
+            "his explosive batting and fast-medium bowling."
+        ),
+        "career": (
+            "He has represented India in all three formats and has been "
+            "an important all-rounder in limited-overs cricket."
+        ),
+        "achievements": [
+            "Represented India in international cricket",
+            "Won the 2024 T20 World Cup with India",
+            "Successful IPL all-rounder"
+        ]
+    },
+
+    "Jasprit Bumrah": {
+        "role": "Fast Bowler",
+        "batting": "Right-handed",
+        "about": (
+            "Jasprit Bumrah is an Indian international fast bowler known "
+            "for his accuracy, pace and unusual bowling action."
+        ),
+        "career": (
+            "He has become one of India's leading fast bowlers across "
+            "Test, ODI and T20I cricket."
+        ),
+        "achievements": [
+            "Represented India in all three formats",
+            "Won the 2024 T20 World Cup with India",
+            "Known for exceptional death bowling"
+        ]
+    },
+
+    "Kapil Dev": {
+        "role": "All-rounder",
+        "batting": "Right-handed",
+        "about": (
+            "Kapil Dev is a legendary Indian cricketer and one of India's "
+            "greatest all-rounders."
+        ),
+        "career": (
+            "He captained India to its first Cricket World Cup victory "
+            "in 1983."
+        ),
+        "achievements": [
+            "Captain of India's 1983 World Cup winning team",
+            "One of India's greatest all-rounders",
+            "Former Indian Test and ODI captain"
+        ]
+    },
+
+    "M.S. Dhoni": {
+        "role": "Wicketkeeper-Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Mahendra Singh Dhoni is a former Indian international "
+            "cricketer and one of the most successful captains in cricket."
+        ),
+        "career": (
+            "Dhoni captained India to major international tournament "
+            "victories and had a highly successful IPL career."
+        ),
+        "achievements": [
+            "Captain of the 2007 T20 World Cup winning team",
+            "Captain of the 2011 Cricket World Cup winning team",
+            "Captain of the 2013 Champions Trophy winning team",
+            "Multiple IPL titles with Chennai Super Kings"
+        ]
+    },
+
+    "Ravindra Jadeja": {
+        "role": "All-rounder",
+        "batting": "Left-handed",
+        "about": (
+            "Ravindra Jadeja is an Indian international cricketer known "
+            "for his left-arm spin bowling, batting and fielding."
+        ),
+        "career": (
+            "He has been an important all-rounder for India in Test and "
+            "limited-overs cricket."
+        ),
+        "achievements": [
+            "Represented India in all three formats",
+            "Won the 2024 T20 World Cup with India",
+            "Known for outstanding fielding"
+        ]
+    },
+
+    "Rohit Sharma": {
+        "role": "Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Rohit Sharma is an Indian international cricketer known "
+            "for his elegant batting and leadership."
+        ),
+        "career": (
+            "He has represented India across formats and has captained "
+            "India in major international tournaments."
+        ),
+        "achievements": [
+            "Captain of India's 2024 T20 World Cup winning team",
+            "Multiple-time IPL champion",
+            "Holds the record for the highest individual ODI score"
+        ]
+    },
+
+    "Ruturaj Gaikwad": {
+        "role": "Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Ruturaj Gaikwad is an Indian cricketer known for his "
+            "technically sound batting."
+        ),
+        "career": (
+            "He has represented India in limited-overs cricket and has "
+            "been a successful batter in the Indian Premier League."
+        ),
+        "achievements": [
+            "Represented India in international cricket",
+            "Successful IPL batter",
+            "Known for consistent top-order batting"
+        ]
+    },
+
+    "Sachin Tendulkar": {
+        "role": "Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Sachin Tendulkar is a legendary Indian cricketer widely "
+            "regarded as one of the greatest batters in cricket history."
+        ),
+        "career": (
+            "He represented India for more than two decades and achieved "
+            "numerous batting records during his international career."
+        ),
+        "achievements": [
+            "Won the 2011 Cricket World Cup with India",
+            "First male cricketer to score a double century in ODI cricket",
+            "100 international centuries",
+            "Bharat Ratna recipient"
+        ]
+    },
+
+    "Virat Kohli": {
+        "role": "Batter",
+        "batting": "Right-handed",
+        "about": (
+            "Virat Kohli is an Indian international cricketer known for "
+            "his batting, fitness and leadership."
+        ),
+        "career": (
+            "He has represented India across formats and has been one of "
+            "the leading run-scorers in modern international cricket."
+        ),
+        "achievements": [
+            "Won the 2011 Cricket World Cup with India",
+            "Won the 2024 T20 World Cup with India",
+            "Multiple ICC awards",
+            "Former captain of the Indian cricket team"
+        ]
+    }
+
+}
+
+
+# ============================================================
+# DATASET PATH
+# ============================================================
+
+DATASET_PATH = os.path.join(
+    "dataset",
+    "archive",
+    "indian cricketer"
+)
+
+
+# ============================================================
+# FIND PLAYER IMAGE
+# ============================================================
+
+def find_player_image(player_name):
+
+    folder_name = player_name
+
+    # Dataset uses M.S. Dhoni1
+    if player_name == "M.S. Dhoni":
+        folder_name = "M.S. Dhoni1"
+
+    player_folder = os.path.join(
+        DATASET_PATH,
+        folder_name
+    )
+
+    if not os.path.exists(player_folder):
+        return None
+
+    image_extensions = (
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".bmp",
+        ".webp"
+    )
+
+    image_files = []
+
+    for file in os.listdir(player_folder):
+
+        if file.lower().endswith(image_extensions):
+
+            image_files.append(
+                os.path.join(player_folder, file)
+            )
+
+    if len(image_files) == 0:
+        return None
+
+    return random.choice(image_files)
+
+
+# ============================================================
+# EXTRACT HOG FEATURES
 # ============================================================
 
 def extract_hog_features(face):
 
-    face = cv2.resize(face, (100, 100))
+    face = cv2.resize(
+        face,
+        (100, 100)
+    )
 
     face = face / 255.0
 
@@ -256,10 +397,12 @@ def extract_hog_features(face):
 
 
 # ============================================================
-# SIDEBAR NAVIGATION
+# SIDEBAR
 # ============================================================
 
-st.sidebar.title("🏏 Cricket Face Analyzer")
+st.sidebar.title(
+    "🏏 Cricket Face Analyzer"
+)
 
 page = st.sidebar.radio(
     "Navigation",
@@ -283,7 +426,9 @@ if page == "🏠 Home":
     )
 
     st.markdown(
-        '<div class="subtitle">Computer Vision Based Cricket Face Classification</div>',
+        '<div class="subtitle">'
+        'Computer Vision Based Cricket Face Classification'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -314,40 +459,30 @@ if page == "🏠 Home":
         st.subheader("🤖 Classification")
 
         st.write(
-            "Uses Logistic Regression to classify "
-            "the detected face into one of the trained classes."
+            "Uses the trained machine learning model "
+            "to identify the cricket player."
         )
 
     st.divider()
 
     st.header("How the application works")
 
-    st.write(
-        "1. Upload an image."
-    )
+    st.write("1. Upload an image.")
 
-    st.write(
-        "2. The application detects the largest face."
-    )
+    st.write("2. The application detects the largest face.")
 
-    st.write(
-        "3. The detected face is resized to 100 × 100 pixels."
-    )
+    st.write("3. The detected face is resized to 100 × 100 pixels.")
 
-    st.write(
-        "4. HOG extracts 4356 facial features."
-    )
+    st.write("4. HOG extracts facial features.")
 
-    st.write(
-        "5. Logistic Regression performs classification."
-    )
+    st.write("5. The trained model performs classification.")
 
-    st.write(
-        "6. The application displays the predicted class and confidence."
-    )
+    st.write("6. The application identifies the player.")
+
+    st.write("7. The player's information is displayed.")
 
     st.info(
-        "Use the Face Analysis page to test the trained computer vision model."
+        "Use the Face Analysis page to test the trained model."
     )
 
 
@@ -363,18 +498,28 @@ elif page == "🔍 Face Analysis":
     )
 
     st.markdown(
-        '<div class="subtitle">Upload an image to analyze the detected face</div>',
+        '<div class="subtitle">'
+        'Upload an image to identify the cricket player'
+        '</div>',
         unsafe_allow_html=True
     )
 
     uploaded_file = st.file_uploader(
         "Upload an image",
-        type=["jpg", "jpeg", "png", "bmp", "webp"]
+        type=[
+            "jpg",
+            "jpeg",
+            "png",
+            "bmp",
+            "webp"
+        ]
     )
 
     if uploaded_file is not None:
 
-        image = Image.open(uploaded_file).convert("RGB")
+        image = Image.open(
+            uploaded_file
+        ).convert("RGB")
 
         image_array = np.array(image)
 
@@ -393,7 +538,8 @@ elif page == "🔍 Face Analysis":
         if len(faces) == 0:
 
             st.error(
-                "❌ No face detected. Please upload a clearer face image."
+                "❌ No face detected. "
+                "Please upload a clearer face image."
             )
 
         else:
@@ -411,20 +557,50 @@ elif page == "🔍 Face Analysis":
                 x:x + w
             ]
 
-            # Extract HOG
+            # ====================================================
+            # HOG FEATURES
+            # ====================================================
+
             features = extract_hog_features(face)
 
-            features = features.reshape(1, -1)
+            features = features.reshape(
+                1,
+                -1
+            )
 
-            # Prediction
-            prediction = model.predict(features)[0]
+            # ====================================================
+            # PREDICTION
+            # ====================================================
 
-            # Confidence
-            probabilities = model.predict_proba(features)[0]
+            prediction = model.predict(
+                features
+            )[0]
 
-            confidence = np.max(probabilities) * 100
+            probabilities = model.predict_proba(
+                features
+            )[0]
 
-            # Draw rectangle
+            confidence = (
+                np.max(probabilities) * 100
+            )
+
+            # ====================================================
+            # CONVERT MODEL LABEL TO PLAYER NAME
+            # ====================================================
+
+            player_name = player_names.get(
+                str(prediction),
+                str(prediction)
+            )
+
+            profile = player_profiles.get(
+                player_name
+            )
+
+            # ====================================================
+            # DRAW FACE RECTANGLE
+            # ====================================================
+
             result_image = image_array.copy()
 
             cv2.rectangle(
@@ -435,21 +611,26 @@ elif page == "🔍 Face Analysis":
                 3
             )
 
-            # Crop face for display
+            # ====================================================
+            # DETECTED FACE
+            # ====================================================
+
             detected_face = image_array[
                 y:y + h,
                 x:x + w
             ]
 
-            # =================================================
+            # ====================================================
             # DISPLAY IMAGES
-            # =================================================
+            # ====================================================
 
             col1, col2 = st.columns(2)
 
             with col1:
 
-                st.subheader("📷 Uploaded Image")
+                st.subheader(
+                    "📷 Uploaded Image"
+                )
 
                 st.image(
                     image,
@@ -458,7 +639,9 @@ elif page == "🔍 Face Analysis":
 
             with col2:
 
-                st.subheader("🎯 Detected Face")
+                st.subheader(
+                    "🎯 Detected Face"
+                )
 
                 st.image(
                     detected_face,
@@ -467,7 +650,9 @@ elif page == "🔍 Face Analysis":
 
             st.divider()
 
-            st.subheader("🔎 Detection Result")
+            st.subheader(
+                "🔎 Detection Result"
+            )
 
             st.image(
                 result_image,
@@ -475,16 +660,16 @@ elif page == "🔍 Face Analysis":
                 use_container_width=True
             )
 
-            # =================================================
-            # PREDICTION
-            # =================================================
+            # ====================================================
+            # PLAYER RESULT
+            # ====================================================
 
             st.markdown(
                 f"""
                 <div class="result-box">
 
                     <div class="prediction">
-                        Prediction: {prediction}
+                        🏏 {player_name}
                     </div>
 
                     <div class="confidence">
@@ -500,52 +685,161 @@ elif page == "🔍 Face Analysis":
                 int(min(confidence, 100))
             )
 
+            # ====================================================
+            # CONFIDENCE MESSAGE
+            # ====================================================
+
             if confidence >= 70:
 
                 st.success(
-                    "High confidence prediction."
+                    "✅ High confidence prediction."
                 )
 
             elif confidence >= 50:
 
                 st.warning(
-                    "Moderate confidence prediction."
+                    "⚠️ Moderate confidence prediction."
                 )
 
             else:
 
                 st.warning(
-                    "Low confidence prediction. "
-                    "Try a clearer image with the face facing the camera."
+                    "⚠️ Low confidence prediction. "
+                    "Try a clearer image."
                 )
+
+            # ====================================================
+            # PLAYER INFORMATION
+            # ====================================================
+
+            if profile is not None:
+
+                st.divider()
+
+                st.header(
+                    f"🏏 About {player_name}"
+                )
+
+                # ------------------------------------------------
+                # PLAYER IMAGE
+                # ------------------------------------------------
+
+                player_image = find_player_image(
+                    player_name
+                )
+
+                if player_image is not None:
+
+                    col1, col2 = st.columns(
+                        [1, 2]
+                    )
+
+                    with col1:
+
+                        st.image(
+                            player_image,
+                            caption=player_name,
+                            use_container_width=True
+                        )
+
+                    with col2:
+
+                        st.subheader(
+                            "👤 Player Information"
+                        )
+
+                        st.write(
+                            profile["about"]
+                        )
+
+                        st.write(
+                            f"**Role:** {profile['role']}"
+                        )
+
+                        st.write(
+                            f"**Batting:** {profile['batting']}"
+                        )
+
+                else:
+
+                    st.subheader(
+                        "👤 Player Information"
+                    )
+
+                    st.write(
+                        profile["about"]
+                    )
+
+                    st.write(
+                        f"**Role:** {profile['role']}"
+                    )
+
+                    st.write(
+                        f"**Batting:** {profile['batting']}"
+                    )
+
+                # ------------------------------------------------
+                # CAREER
+                # ------------------------------------------------
+
+                st.subheader(
+                    "📋 Career"
+                )
+
+                st.write(
+                    profile["career"]
+                )
+
+                # ------------------------------------------------
+                # ACHIEVEMENTS
+                # ------------------------------------------------
+
+                st.subheader(
+                    "🏆 Achievements"
+                )
+
+                for achievement in profile["achievements"]:
+
+                    st.write(
+                        f"• {achievement}"
+                    )
+
+            # ====================================================
+            # MODEL INFORMATION
+            # ====================================================
 
             st.divider()
 
-            st.subheader("🧠 Model Information")
+            st.subheader(
+                "🧠 Model Information"
+            )
 
             col1, col2, col3 = st.columns(3)
 
             with col1:
+
                 st.metric(
                     "Feature Method",
                     "HOG"
                 )
 
             with col2:
+
                 st.metric(
                     "Feature Count",
-                    "4356"
+                    str(features.shape[1])
                 )
 
             with col3:
+
                 st.metric(
                     "Classifier",
-                    "Logistic Regression"
+                    type(model).__name__
                 )
 
 
 # ============================================================
-# PLAYER PROFILE PAGE
+# PLAYER PROFILES PAGE
 # ============================================================
 
 elif page == "🏏 Player Profiles":
@@ -556,58 +850,91 @@ elif page == "🏏 Player Profiles":
     )
 
     st.markdown(
-        '<div class="subtitle">Explore cricket player information</div>',
+        '<div class="subtitle">'
+        'Explore cricket player information'
+        '</div>',
         unsafe_allow_html=True
     )
 
     selected_player = st.selectbox(
-        "Select a player profile",
+        "Select a player",
         list(player_profiles.keys())
     )
 
-    profile = player_profiles[selected_player]
+    profile = player_profiles[
+        selected_player
+    ]
 
     st.divider()
 
-    st.markdown(
-        '<div class="profile-box">',
-        unsafe_allow_html=True
+    # Player image
+    player_image = find_player_image(
+        selected_player
     )
 
-    st.header(
-        f"🏏 {profile['title']}"
+    col1, col2 = st.columns(
+        [1, 2]
     )
 
-    st.subheader("Role")
+    with col1:
 
-    st.write(
-        profile["role"]
+        if player_image is not None:
+
+            st.image(
+                player_image,
+                caption=selected_player,
+                use_container_width=True
+            )
+
+    with col2:
+
+        st.header(
+            f"🏏 {selected_player}"
+        )
+
+        st.subheader(
+            "Role"
+        )
+
+        st.write(
+            profile["role"]
+        )
+
+        st.subheader(
+            "Batting"
+        )
+
+        st.write(
+            profile["batting"]
+        )
+
+        st.subheader(
+            "Biography"
+        )
+
+        st.write(
+            profile["about"]
+        )
+
+    st.divider()
+
+    st.subheader(
+        "📋 Career"
     )
-
-    st.subheader("Biography")
-
-    st.write(
-        profile["bio"]
-    )
-
-    st.subheader("Career")
 
     st.write(
         profile["career"]
     )
 
-    st.subheader("🏆 Achievements")
+    st.subheader(
+        "🏆 Achievements"
+    )
 
     for achievement in profile["achievements"]:
 
         st.write(
             f"• {achievement}"
         )
-
-    st.markdown(
-        '</div>',
-        unsafe_allow_html=True
-    )
 
 
 # ============================================================
@@ -617,5 +944,6 @@ elif page == "🏏 Player Profiles":
 st.divider()
 
 st.caption(
-    "Computer Vision Project | Haar Cascade + HOG + Logistic Regression"
+    "Computer Vision Project | "
+    "Haar Cascade + HOG + Machine Learning"
 )
