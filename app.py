@@ -6,6 +6,7 @@ from skimage.feature import hog
 from PIL import Image
 import os
 import random
+import requests
 
 
 # ============================================================
@@ -50,7 +51,7 @@ st.markdown(
     }
 
     .prediction {
-        font-size: 30px;
+        font-size: 32px;
         font-weight: 700;
     }
 
@@ -59,11 +60,24 @@ st.markdown(
         margin-top: 10px;
     }
 
+    .bio-box {
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid #dddddd;
+        margin-top: 20px;
+        line-height: 1.7;
+    }
+
     .profile-box {
         padding: 25px;
         border-radius: 15px;
         border: 1px solid #dddddd;
         margin-top: 20px;
+    }
+
+    .wiki-button {
+        font-size: 18px;
+        font-weight: 600;
     }
 
     </style>
@@ -95,7 +109,8 @@ model, hog_settings = load_model()
 @st.cache_resource
 def load_face_detector():
 
-    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    cascade_path = cv2.data.haarcascades + \
+        "haarcascade_frontalface_default.xml"
 
     detector = cv2.CascadeClassifier(cascade_path)
 
@@ -126,192 +141,98 @@ player_names = {
 
 
 # ============================================================
-# PLAYER PROFILE DATA
+# WIKIPEDIA LINKS
 # ============================================================
 
-player_profiles = {
+wikipedia_links = {
+
+    "Ambati Rayudu":
+        "https://en.wikipedia.org/wiki/Ambati_Rayudu",
+
+    "Hardik Pandya":
+        "https://en.wikipedia.org/wiki/Hardik_Pandya",
+
+    "Jasprit Bumrah":
+        "https://en.wikipedia.org/wiki/Jasprit_Bumrah",
+
+    "Kapil Dev":
+        "https://en.wikipedia.org/wiki/Kapil_Dev",
+
+    "M.S. Dhoni":
+        "https://en.wikipedia.org/wiki/MS_Dhoni",
+
+    "Ravindra Jadeja":
+        "https://en.wikipedia.org/wiki/Ravindra_Jadeja",
+
+    "Rohit Sharma":
+        "https://en.wikipedia.org/wiki/Rohit_Sharma",
+
+    "Ruturaj Gaikwad":
+        "https://en.wikipedia.org/wiki/Ruturaj_Gaikwad",
+
+    "Sachin Tendulkar":
+        "https://en.wikipedia.org/wiki/Sachin_Tendulkar",
+
+    "Virat Kohli":
+        "https://en.wikipedia.org/wiki/Virat_Kohli"
+
+}
+
+
+# ============================================================
+# PLAYER BASIC INFORMATION
+# ============================================================
+
+player_info = {
 
     "Ambati Rayudu": {
         "role": "Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Ambati Rayudu is an Indian cricketer known for his batting "
-            "and his performances in domestic and international cricket."
-        ),
-        "career": (
-            "Rayudu represented India in limited-overs cricket and played "
-            "for several teams in domestic cricket and the Indian Premier League."
-        ),
-        "achievements": [
-            "Represented India in international cricket",
-            "Played for multiple IPL teams",
-            "Known for his middle-order batting"
-        ]
+        "batting": "Right-handed"
     },
 
     "Hardik Pandya": {
         "role": "All-rounder",
-        "batting": "Right-handed",
-        "about": (
-            "Hardik Pandya is an Indian international cricketer known for "
-            "his explosive batting and fast-medium bowling."
-        ),
-        "career": (
-            "He has represented India in all three formats and has been "
-            "an important all-rounder in limited-overs cricket."
-        ),
-        "achievements": [
-            "Represented India in international cricket",
-            "Won the 2024 T20 World Cup with India",
-            "Successful IPL all-rounder"
-        ]
+        "batting": "Right-handed"
     },
 
     "Jasprit Bumrah": {
         "role": "Fast Bowler",
-        "batting": "Right-handed",
-        "about": (
-            "Jasprit Bumrah is an Indian international fast bowler known "
-            "for his accuracy, pace and unusual bowling action."
-        ),
-        "career": (
-            "He has become one of India's leading fast bowlers across "
-            "Test, ODI and T20I cricket."
-        ),
-        "achievements": [
-            "Represented India in all three formats",
-            "Won the 2024 T20 World Cup with India",
-            "Known for exceptional death bowling"
-        ]
+        "batting": "Right-handed"
     },
 
     "Kapil Dev": {
         "role": "All-rounder",
-        "batting": "Right-handed",
-        "about": (
-            "Kapil Dev is a legendary Indian cricketer and one of India's "
-            "greatest all-rounders."
-        ),
-        "career": (
-            "He captained India to its first Cricket World Cup victory "
-            "in 1983."
-        ),
-        "achievements": [
-            "Captain of India's 1983 World Cup winning team",
-            "One of India's greatest all-rounders",
-            "Former Indian Test and ODI captain"
-        ]
+        "batting": "Right-handed"
     },
 
     "M.S. Dhoni": {
         "role": "Wicketkeeper-Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Mahendra Singh Dhoni is a former Indian international "
-            "cricketer and one of the most successful captains in cricket."
-        ),
-        "career": (
-            "Dhoni captained India to major international tournament "
-            "victories and had a highly successful IPL career."
-        ),
-        "achievements": [
-            "Captain of the 2007 T20 World Cup winning team",
-            "Captain of the 2011 Cricket World Cup winning team",
-            "Captain of the 2013 Champions Trophy winning team",
-            "Multiple IPL titles with Chennai Super Kings"
-        ]
+        "batting": "Right-handed"
     },
 
     "Ravindra Jadeja": {
         "role": "All-rounder",
-        "batting": "Left-handed",
-        "about": (
-            "Ravindra Jadeja is an Indian international cricketer known "
-            "for his left-arm spin bowling, batting and fielding."
-        ),
-        "career": (
-            "He has been an important all-rounder for India in Test and "
-            "limited-overs cricket."
-        ),
-        "achievements": [
-            "Represented India in all three formats",
-            "Won the 2024 T20 World Cup with India",
-            "Known for outstanding fielding"
-        ]
+        "batting": "Left-handed"
     },
 
     "Rohit Sharma": {
         "role": "Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Rohit Sharma is an Indian international cricketer known "
-            "for his elegant batting and leadership."
-        ),
-        "career": (
-            "He has represented India across formats and has captained "
-            "India in major international tournaments."
-        ),
-        "achievements": [
-            "Captain of India's 2024 T20 World Cup winning team",
-            "Multiple-time IPL champion",
-            "Holds the record for the highest individual ODI score"
-        ]
+        "batting": "Right-handed"
     },
 
     "Ruturaj Gaikwad": {
         "role": "Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Ruturaj Gaikwad is an Indian cricketer known for his "
-            "technically sound batting."
-        ),
-        "career": (
-            "He has represented India in limited-overs cricket and has "
-            "been a successful batter in the Indian Premier League."
-        ),
-        "achievements": [
-            "Represented India in international cricket",
-            "Successful IPL batter",
-            "Known for consistent top-order batting"
-        ]
+        "batting": "Right-handed"
     },
 
     "Sachin Tendulkar": {
         "role": "Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Sachin Tendulkar is a legendary Indian cricketer widely "
-            "regarded as one of the greatest batters in cricket history."
-        ),
-        "career": (
-            "He represented India for more than two decades and achieved "
-            "numerous batting records during his international career."
-        ),
-        "achievements": [
-            "Won the 2011 Cricket World Cup with India",
-            "First male cricketer to score a double century in ODI cricket",
-            "100 international centuries",
-            "Bharat Ratna recipient"
-        ]
+        "batting": "Right-handed"
     },
 
     "Virat Kohli": {
         "role": "Batter",
-        "batting": "Right-handed",
-        "about": (
-            "Virat Kohli is an Indian international cricketer known for "
-            "his batting, fitness and leadership."
-        ),
-        "career": (
-            "He has represented India across formats and has been one of "
-            "the leading run-scorers in modern international cricket."
-        ),
-        "achievements": [
-            "Won the 2011 Cricket World Cup with India",
-            "Won the 2024 T20 World Cup with India",
-            "Multiple ICC awards",
-            "Former captain of the Indian cricket team"
-        ]
+        "batting": "Right-handed"
     }
 
 }
@@ -336,7 +257,7 @@ def find_player_image(player_name):
 
     folder_name = player_name
 
-    # Dataset uses M.S. Dhoni1
+    # Actual dataset folder name
     if player_name == "M.S. Dhoni":
         folder_name = "M.S. Dhoni1"
 
@@ -373,6 +294,72 @@ def find_player_image(player_name):
 
 
 # ============================================================
+# GET LONG WIKIPEDIA BIOGRAPHY
+# ============================================================
+
+@st.cache_data
+def get_wikipedia_biography(player_name):
+
+    if player_name not in wikipedia_links:
+        return None
+
+    url = wikipedia_links[player_name]
+
+    try:
+
+        api_url = "https://en.wikipedia.org/w/api.php"
+
+        params = {
+            "action": "query",
+            "prop": "extracts",
+            "explaintext": "1",
+            "exsectionformat": "plain",
+            "titles": player_name,
+            "format": "json",
+            "formatversion": "2",
+            "redirects": "1"
+        }
+
+        headers = {
+            "User-Agent":
+                "CricketFaceAnalyzer/1.0 "
+                "(educational project)"
+        }
+
+        response = requests.get(
+            api_url,
+            params=params,
+            headers=headers,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        pages = data["query"]["pages"]
+
+        if len(pages) == 0:
+            return None
+
+        page = pages[0]
+
+        biography = page.get(
+            "extract",
+            ""
+        )
+
+        if biography.strip() == "":
+            return None
+
+        return biography
+
+    except Exception as e:
+
+        return None
+
+
+# ============================================================
 # EXTRACT HOG FEATURES
 # ============================================================
 
@@ -397,7 +384,7 @@ def extract_hog_features(face):
 
 
 # ============================================================
-# SIDEBAR
+# SIDEBAR NAVIGATION
 # ============================================================
 
 st.sidebar.title(
@@ -421,7 +408,9 @@ page = st.sidebar.radio(
 if page == "🏠 Home":
 
     st.markdown(
-        '<div class="main-title">🏏 Cricket Face Analyzer</div>',
+        '<div class="main-title">'
+        '🏏 Cricket Face Analyzer'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -438,16 +427,20 @@ if page == "🏠 Home":
 
     with col1:
 
-        st.subheader("📷 Face Detection")
+        st.subheader(
+            "📷 Face Detection"
+        )
 
         st.write(
-            "Detects a face from an uploaded image using "
-            "the Haar Cascade algorithm."
+            "Detects a face from an uploaded image "
+            "using the Haar Cascade algorithm."
         )
 
     with col2:
 
-        st.subheader("🧠 Feature Extraction")
+        st.subheader(
+            "🧠 Feature Extraction"
+        )
 
         st.write(
             "Extracts facial features using "
@@ -456,7 +449,9 @@ if page == "🏠 Home":
 
     with col3:
 
-        st.subheader("🤖 Classification")
+        st.subheader(
+            "🤖 Classification"
+        )
 
         st.write(
             "Uses the trained machine learning model "
@@ -465,24 +460,45 @@ if page == "🏠 Home":
 
     st.divider()
 
-    st.header("How the application works")
+    st.header(
+        "How the application works"
+    )
 
-    st.write("1. Upload an image.")
+    st.write(
+        "1. Upload an image."
+    )
 
-    st.write("2. The application detects the largest face.")
+    st.write(
+        "2. The application detects the largest face."
+    )
 
-    st.write("3. The detected face is resized to 100 × 100 pixels.")
+    st.write(
+        "3. The detected face is resized to 100 × 100 pixels."
+    )
 
-    st.write("4. HOG extracts facial features.")
+    st.write(
+        "4. HOG extracts facial features."
+    )
 
-    st.write("5. The trained model performs classification.")
+    st.write(
+        "5. The trained machine learning model "
+        "performs classification."
+    )
 
-    st.write("6. The application identifies the player.")
+    st.write(
+        "6. The application identifies the player."
+    )
 
-    st.write("7. The player's information is displayed.")
+    st.write(
+        "7. The player's image and information are displayed."
+    )
+
+    st.write(
+        "8. A long biography is retrieved from Wikipedia."
+    )
 
     st.info(
-        "Use the Face Analysis page to test the trained model."
+        "Go to Face Analysis to test the model."
     )
 
 
@@ -493,7 +509,9 @@ if page == "🏠 Home":
 elif page == "🔍 Face Analysis":
 
     st.markdown(
-        '<div class="main-title">🔍 Face Analysis</div>',
+        '<div class="main-title">'
+        '🔍 Face Analysis'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -517,16 +535,28 @@ elif page == "🔍 Face Analysis":
 
     if uploaded_file is not None:
 
+        # ====================================================
+        # LOAD IMAGE
+        # ====================================================
+
         image = Image.open(
             uploaded_file
         ).convert("RGB")
 
         image_array = np.array(image)
 
+        # ====================================================
+        # CONVERT TO GRAYSCALE
+        # ====================================================
+
         gray = cv2.cvtColor(
             image_array,
             cv2.COLOR_RGB2GRAY
         )
+
+        # ====================================================
+        # DETECT FACES
+        # ====================================================
 
         faces = face_cascade.detectMultiScale(
             gray,
@@ -539,15 +569,19 @@ elif page == "🔍 Face Analysis":
 
             st.error(
                 "❌ No face detected. "
-                "Please upload a clearer face image."
+                "Please upload a clearer image."
             )
 
         else:
 
-            # Find largest face
+            # ====================================================
+            # FIND LARGEST FACE
+            # ====================================================
+
             largest_face = max(
                 faces,
-                key=lambda rect: rect[2] * rect[3]
+                key=lambda rect:
+                rect[2] * rect[3]
             )
 
             x, y, w, h = largest_face
@@ -558,10 +592,12 @@ elif page == "🔍 Face Analysis":
             ]
 
             # ====================================================
-            # HOG FEATURES
+            # EXTRACT HOG FEATURES
             # ====================================================
 
-            features = extract_hog_features(face)
+            features = extract_hog_features(
+                face
+            )
 
             features = features.reshape(
                 1,
@@ -569,7 +605,7 @@ elif page == "🔍 Face Analysis":
             )
 
             # ====================================================
-            # PREDICTION
+            # MODEL PREDICTION
             # ====================================================
 
             prediction = model.predict(
@@ -593,8 +629,13 @@ elif page == "🔍 Face Analysis":
                 str(prediction)
             )
 
-            profile = player_profiles.get(
-                player_name
+            # ====================================================
+            # PLAYER INFORMATION
+            # ====================================================
+
+            info = player_info.get(
+                player_name,
+                {}
             )
 
             # ====================================================
@@ -612,7 +653,7 @@ elif page == "🔍 Face Analysis":
             )
 
             # ====================================================
-            # DETECTED FACE
+            # CROP DETECTED FACE
             # ====================================================
 
             detected_face = image_array[
@@ -621,7 +662,7 @@ elif page == "🔍 Face Analysis":
             ]
 
             # ====================================================
-            # DISPLAY IMAGES
+            # DISPLAY UPLOADED IMAGE
             # ====================================================
 
             col1, col2 = st.columns(2)
@@ -650,6 +691,10 @@ elif page == "🔍 Face Analysis":
 
             st.divider()
 
+            # ====================================================
+            # DETECTION RESULT
+            # ====================================================
+
             st.subheader(
                 "🔎 Detection Result"
             )
@@ -661,7 +706,7 @@ elif page == "🔍 Face Analysis":
             )
 
             # ====================================================
-            # PLAYER RESULT
+            # PLAYER NAME + CONFIDENCE
             # ====================================================
 
             st.markdown(
@@ -705,104 +750,146 @@ elif page == "🔍 Face Analysis":
 
                 st.warning(
                     "⚠️ Low confidence prediction. "
-                    "Try a clearer image."
+                    "Try a clearer image with the face "
+                    "facing the camera."
                 )
 
             # ====================================================
             # PLAYER INFORMATION
             # ====================================================
 
-            if profile is not None:
+            st.divider()
 
-                st.divider()
+            st.header(
+                f"🏏 About {player_name}"
+            )
 
-                st.header(
-                    f"🏏 About {player_name}"
-                )
+            # ====================================================
+            # PLAYER IMAGE
+            # ====================================================
 
-                # ------------------------------------------------
-                # PLAYER IMAGE
-                # ------------------------------------------------
+            player_image = find_player_image(
+                player_name
+            )
 
-                player_image = find_player_image(
-                    player_name
-                )
+            col1, col2 = st.columns(
+                [1, 2]
+            )
+
+            with col1:
 
                 if player_image is not None:
 
-                    col1, col2 = st.columns(
-                        [1, 2]
+                    st.image(
+                        player_image,
+                        caption=player_name,
+                        use_container_width=True
                     )
-
-                    with col1:
-
-                        st.image(
-                            player_image,
-                            caption=player_name,
-                            use_container_width=True
-                        )
-
-                    with col2:
-
-                        st.subheader(
-                            "👤 Player Information"
-                        )
-
-                        st.write(
-                            profile["about"]
-                        )
-
-                        st.write(
-                            f"**Role:** {profile['role']}"
-                        )
-
-                        st.write(
-                            f"**Batting:** {profile['batting']}"
-                        )
 
                 else:
 
-                    st.subheader(
-                        "👤 Player Information"
+                    st.info(
+                        "Player image not found "
+                        "in the dataset."
                     )
 
-                    st.write(
-                        profile["about"]
-                    )
-
-                    st.write(
-                        f"**Role:** {profile['role']}"
-                    )
-
-                    st.write(
-                        f"**Batting:** {profile['batting']}"
-                    )
-
-                # ------------------------------------------------
-                # CAREER
-                # ------------------------------------------------
+            with col2:
 
                 st.subheader(
-                    "📋 Career"
+                    "👤 Player Details"
+                )
+
+                if info:
+
+                    st.write(
+                        f"**Role:** {info.get('role', 'N/A')}"
+                    )
+
+                    st.write(
+                        f"**Batting:** "
+                        f"{info.get('batting', 'N/A')}"
+                    )
+
+                st.write(
+                    f"**Recognized as:** "
+                    f"{player_name}"
+                )
+
+            # ====================================================
+            # WIKIPEDIA BIOGRAPHY
+            # ====================================================
+
+            st.divider()
+
+            st.subheader(
+                "📖 Biography"
+            )
+
+            with st.spinner(
+                f"Loading {player_name}'s biography from Wikipedia..."
+            ):
+
+                biography = get_wikipedia_biography(
+                    player_name
+                )
+
+            if biography:
+
+                # ------------------------------------------------
+                # Split biography into paragraphs
+                # ------------------------------------------------
+
+                paragraphs = biography.split("\n")
+
+                for paragraph in paragraphs:
+
+                    paragraph = paragraph.strip()
+
+                    if paragraph:
+
+                        st.markdown(
+                            paragraph
+                        )
+
+            else:
+
+                st.warning(
+                    "Wikipedia biography could not be "
+                    "loaded right now."
                 )
 
                 st.write(
-                    profile["career"]
+                    "You can read the complete biography "
+                    "using the Wikipedia link below."
                 )
 
-                # ------------------------------------------------
-                # ACHIEVEMENTS
-                # ------------------------------------------------
+            # ====================================================
+            # WIKIPEDIA LINK
+            # ====================================================
 
-                st.subheader(
-                    "🏆 Achievements"
+            st.divider()
+
+            st.subheader(
+                "📚 Source"
+            )
+
+            wiki_url = wikipedia_links.get(
+                player_name
+            )
+
+            if wiki_url:
+
+                st.markdown(
+                    f"""
+                    <div class="wiki-button">
+
+                    📖 [Read the full {player_name}
+                    biography on Wikipedia]({wiki_url})
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
                 )
-
-                for achievement in profile["achievements"]:
-
-                    st.write(
-                        f"• {achievement}"
-                    )
 
             # ====================================================
             # MODEL INFORMATION
@@ -845,7 +932,9 @@ elif page == "🔍 Face Analysis":
 elif page == "🏏 Player Profiles":
 
     st.markdown(
-        '<div class="main-title">🏏 Player Profiles</div>',
+        '<div class="main-title">'
+        '🏏 Player Profiles'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -858,16 +947,15 @@ elif page == "🏏 Player Profiles":
 
     selected_player = st.selectbox(
         "Select a player",
-        list(player_profiles.keys())
+        list(player_names.values())
     )
-
-    profile = player_profiles[
-        selected_player
-    ]
 
     st.divider()
 
-    # Player image
+    # ========================================================
+    # PLAYER IMAGE
+    # ========================================================
+
     player_image = find_player_image(
         selected_player
     )
@@ -886,54 +974,86 @@ elif page == "🏏 Player Profiles":
                 use_container_width=True
             )
 
+        else:
+
+            st.info(
+                "Player image not found."
+            )
+
     with col2:
 
         st.header(
             f"🏏 {selected_player}"
         )
 
-        st.subheader(
-            "Role"
+        info = player_info.get(
+            selected_player,
+            {}
         )
 
         st.write(
-            profile["role"]
-        )
-
-        st.subheader(
-            "Batting"
+            f"**Role:** "
+            f"{info.get('role', 'N/A')}"
         )
 
         st.write(
-            profile["batting"]
+            f"**Batting:** "
+            f"{info.get('batting', 'N/A')}"
         )
 
-        st.subheader(
-            "Biography"
-        )
-
-        st.write(
-            profile["about"]
-        )
+    # ========================================================
+    # WIKIPEDIA BIOGRAPHY
+    # ========================================================
 
     st.divider()
 
     st.subheader(
-        "📋 Career"
+        "📖 Biography"
     )
 
-    st.write(
-        profile["career"]
+    with st.spinner(
+        "Loading biography from Wikipedia..."
+    ):
+
+        biography = get_wikipedia_biography(
+            selected_player
+        )
+
+    if biography:
+
+        paragraphs = biography.split("\n")
+
+        for paragraph in paragraphs:
+
+            paragraph = paragraph.strip()
+
+            if paragraph:
+
+                st.markdown(
+                    paragraph
+                )
+
+    else:
+
+        st.warning(
+            "Wikipedia biography could not be loaded."
+        )
+
+    # ========================================================
+    # WIKIPEDIA LINK
+    # ========================================================
+
+    st.divider()
+
+    wiki_url = wikipedia_links.get(
+        selected_player
     )
 
-    st.subheader(
-        "🏆 Achievements"
-    )
+    if wiki_url:
 
-    for achievement in profile["achievements"]:
-
-        st.write(
-            f"• {achievement}"
+        st.markdown(
+            f"📖 [Read the full biography of "
+            f"{selected_player} on Wikipedia]({wiki_url})"
         )
 
 
@@ -945,5 +1065,6 @@ st.divider()
 
 st.caption(
     "Computer Vision Project | "
-    "Haar Cascade + HOG + Machine Learning"
+    "Haar Cascade + HOG + Machine Learning | "
+    "Player information sourced from Wikipedia"
 )
